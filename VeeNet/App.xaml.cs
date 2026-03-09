@@ -27,11 +27,34 @@ public partial class App : Application
         };
 
         var contextMenu = new ContextMenuStrip();
+
+        var prevItem = contextMenu.Items.Add("⏮ Previous", null, async (_, _) => await _mediaService!.PreviousAsync());
+        var playPauseItem = contextMenu.Items.Add("⏯ Play/Pause", null, async (_, _) => await _mediaService!.PlayPauseAsync());
+        var nextItem = contextMenu.Items.Add("⏭ Next", null, async (_, _) => await _mediaService!.NextAsync());
+
+        contextMenu.Items.Add(new ToolStripSeparator());
+
+        var startupItem = new ToolStripMenuItem("Run on Startup")
+        {
+            CheckOnClick = true,
+            Checked = StartupService.IsEnabled,
+        };
+        startupItem.CheckedChanged += (_, _) => StartupService.SetEnabled(startupItem.Checked);
+        contextMenu.Items.Add(startupItem);
+
+        contextMenu.Items.Add(new ToolStripSeparator());
+
         contextMenu.Items.Add("Exit", null, (_, _) =>
         {
             _trayIcon.Visible = false;
             Shutdown();
         });
+
+        contextMenu.Opening += (_, _) =>
+        {
+            playPauseItem.Text = _mediaService?.IsPlaying == true ? "⏸ Pause" : "▶ Play";
+        };
+
         _trayIcon.ContextMenuStrip = contextMenu;
         _trayIcon.MouseClick += TrayIcon_MouseClick;
 

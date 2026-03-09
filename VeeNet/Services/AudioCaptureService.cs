@@ -9,7 +9,20 @@ public sealed class AudioCaptureService : IDisposable
     private WasapiLoopbackCapture? _capture;
     private bool _disposed;
 
-    public float CurrentPeak { get; private set; }
+    public float CurrentPeak
+    {
+        get
+        {
+            try
+            {
+                return _device?.AudioMeterInformation?.MasterPeakValue ?? 0f;
+            }
+            catch
+            {
+                return 0f;
+            }
+        }
+    }
 
     public void Start()
     {
@@ -17,17 +30,9 @@ public sealed class AudioCaptureService : IDisposable
         _device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
 
         _capture = new WasapiLoopbackCapture(_device);
-        _capture.DataAvailable += OnDataAvailable;
+        _capture.DataAvailable += (_, _) => { };
         _capture.RecordingStopped += (_, _) => { };
         _capture.StartRecording();
-    }
-
-    private void OnDataAvailable(object? sender, NAudio.Wave.WaveInEventArgs e)
-    {
-        if (_device != null)
-        {
-            CurrentPeak = _device.AudioMeterInformation.MasterPeakValue;
-        }
     }
 
     public void Stop()
