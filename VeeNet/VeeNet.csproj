@@ -7,7 +7,16 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<PublishSingleFile>true</PublishSingleFile>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<DebugType>embedded</DebugType>
+		<SelfContained>false</SelfContained>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="icon.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="NAudio" Version="2.2.1" />
