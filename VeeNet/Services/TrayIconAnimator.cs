@@ -8,21 +8,20 @@ public sealed class TrayIconAnimator : IDisposable
 {
     private const int IconSize = 16;
     private const int BarCount = 4;
-    private const int TickIntervalMs = 100;
-    private const float Gain = 8f;
+    private const int TickIntervalMs = 120;
 
     private readonly NotifyIcon _trayIcon;
-    private readonly AudioCaptureService _audioService;
+    private readonly MediaSessionService _mediaService;
     private Timer? _timer;
     private readonly float[] _barHeights = new float[BarCount];
     private readonly Random _rng = new();
-    private float _smoothedPeak;
+    private int _tick;
     private bool _disposed;
 
-    public TrayIconAnimator(NotifyIcon trayIcon, AudioCaptureService audioService)
+    public TrayIconAnimator(NotifyIcon trayIcon, MediaSessionService mediaService)
     {
         _trayIcon = trayIcon;
-        _audioService = audioService;
+        _mediaService = mediaService;
     }
 
     public void Start()
@@ -33,15 +32,23 @@ public sealed class TrayIconAnimator : IDisposable
 
     private void Tick(object? state)
     {
-        float rawPeak = _audioService.CurrentPeak;
-        float amplified = MathF.Sqrt(MathF.Min(1f, rawPeak * Gain));
+        bool playing = _mediaService.IsPlaying;
+        _tick++;
 
-        _smoothedPeak = _smoothedPeak * 0.2f + amplified * 0.8f;
-
-        for (int i = 0; i < BarCount; i++)
+        if (playing)
         {
-            float target = MathF.Min(1f, _smoothedPeak * (0.55f + 0.45f * (float)_rng.NextDouble()));
-            _barHeights[i] = _barHeights[i] * 0.25f + target * 0.75f;
+            for (int i = 0; i < BarCount; i++)
+            {
+                float phase = MathF.Sin((_tick * 0.35f) + i * 1.8f) * 0.5f + 0.5f;
+                float jitter = 0.15f * (float)_rng.NextDouble();
+                float target = MathF.Min(1f, phase + jitter);
+                _barHeights[i] = _barHeights[i] * 0.3f + target * 0.7f;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < BarCount; i++)
+                _barHeights[i] = _barHeights[i] * 0.8f;
         }
 
         try
@@ -65,17 +72,13 @@ public sealed class TrayIconAnimator : IDisposable
             int gap = 1;
             int totalW = BarCount * barW + (BarCount - 1) * gap;
             int x0 = (IconSize - totalW) / 2;
+            int maxH = IconSize - 2;
 
             for (int i = 0; i < BarCount; i++)
             {
                 float h = _barHeights[i];
-                int maxH = IconSize - 2;
-                int barH;
-
-                if (_smoothedPeak < 0.01f)
-                    barH = 2;
-                else
-                    barH = Math.Clamp((int)(maxH * h), 3, maxH);
+                int barH = Math.Clamp((int)(maxH * h), 0, maxH);
+                if (barH < 1) continue;
 
                 int x = x0 + i * (barW + gap);
                 int y = IconSize - 1 - barH;
@@ -90,6 +93,16 @@ public sealed class TrayIconAnimator : IDisposable
 
                 using var brush = new SolidBrush(c);
                 g.FillRectangle(brush, x, y, barW, barH);
+            }
+
+            bool allFlat = true;
+            for (int i = 0; i < BarCount; i++)
+                if (_barHeights[i] > 0.02f) { allFlat = false; break; }
+
+            if (allFlat)
+            {
+                using var dimBrush = new SolidBrush(Color.FromArgb(255, 80, 80, 85));
+                g.FillRectangle(dimBrush, 5, 13, 6, 2);
             }
         }
 

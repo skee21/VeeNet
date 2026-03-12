@@ -1,4 +1,3 @@
-## .NET / Visual Studio
 bin/
 obj/
 .vs/
@@ -7,7 +6,6 @@ obj/
 *.userosscache
 *.sln.docstates
 
-## Build results
 [Dd]ebug/
 [Rr]elease/
 x64/
@@ -15,11 +13,9 @@ x86/
 [Bb]uild/
 bld/
 
-## NuGet
 **/packages/*
 *.nupkg
 **/[Pp]ackages/build/
 
-## User-specific files
 *.rsuser
 *.DotSettings.user

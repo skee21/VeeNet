@@ -10,7 +10,6 @@ namespace VeeNet;
 public partial class App : Application
 {
     private NotifyIcon? _trayIcon;
-    private AudioCaptureService? _audioService;
     private TrayIconAnimator? _animator;
     private MediaSessionService? _mediaService;
     private FlyoutWindow? _flyout;
@@ -58,19 +57,11 @@ public partial class App : Application
         _trayIcon.ContextMenuStrip = contextMenu;
         _trayIcon.MouseClick += TrayIcon_MouseClick;
 
-        _audioService = new AudioCaptureService();
-        try
-        {
-            _audioService.Start();
-            _animator = new TrayIconAnimator(_trayIcon, _audioService);
-            _animator.Start();
-        }
-        catch
-        {
-        }
-
         _mediaService = new MediaSessionService();
         await _mediaService.InitializeAsync();
+
+        _animator = new TrayIconAnimator(_trayIcon, _mediaService);
+        _animator.Start();
     }
 
     private void TrayIcon_MouseClick(object? sender, MouseEventArgs e)
@@ -98,7 +89,6 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _animator?.Dispose();
-        _audioService?.Dispose();
         _mediaService?.Dispose();
 
         if (_trayIcon != null)
