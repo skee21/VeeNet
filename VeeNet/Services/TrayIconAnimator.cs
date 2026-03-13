@@ -17,11 +17,17 @@ public sealed class TrayIconAnimator : IDisposable
     private readonly Random _rng = new();
     private int _tick;
     private bool _disposed;
+    private BarTheme _theme = BarTheme.Presets[0];
 
     public TrayIconAnimator(NotifyIcon trayIcon, MediaSessionService mediaService)
     {
         _trayIcon = trayIcon;
         _mediaService = mediaService;
+    }
+
+    public void SetTheme(BarTheme theme)
+    {
+        _theme = theme;
     }
 
     public void Start()
@@ -83,13 +89,7 @@ public sealed class TrayIconAnimator : IDisposable
                 int x = x0 + i * (barW + gap);
                 int y = IconSize - 1 - barH;
 
-                Color c;
-                if (h < 0.4f)
-                    c = Color.FromArgb(255, 0, 230, 118);
-                else if (h < 0.7f)
-                    c = Color.FromArgb(255, 255, 214, 10);
-                else
-                    c = Color.FromArgb(255, 255, 55, 95);
+                Color c = _theme.GetColor(h);
 
                 using var brush = new SolidBrush(c);
                 g.FillRectangle(brush, x, y, barW, barH);
@@ -101,7 +101,8 @@ public sealed class TrayIconAnimator : IDisposable
 
             if (allFlat)
             {
-                using var dimBrush = new SolidBrush(Color.FromArgb(255, 80, 80, 85));
+                Color dimColor = _theme.Colors[0];
+                using var dimBrush = new SolidBrush(Color.FromArgb(100, dimColor.R, dimColor.G, dimColor.B));
                 g.FillRectangle(dimBrush, 5, 13, 6, 2);
             }
         }

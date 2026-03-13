@@ -1,0 +1,71 @@
+<Window x:Class="VeeNet.CustomThemeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Custom Bar Theme"
+        Width="300" Height="330"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#1E1E22"
+        Foreground="White"
+        FontFamily="Segoe UI Variable, Segoe UI"
+        ShowInTaskbar="False"
+        Topmost="True">
+
+    <Window.Resources>
+        <Style x:Key="HexBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#2A2A30"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="MaxLength" Value="7"/>
+        </Style>
+        <Style x:Key="ColorPreview" TargetType="Border">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="#555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Background" Value="#333"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="18,16">
+        <TextBlock Text="Enter 1 to 3 hex colors for the bars:"
+                   FontSize="13" Foreground="#BBB" Margin="0,0,0,12"/>
+
+        <TextBlock Text="Color 1 (required)" FontSize="11" Foreground="#888" Margin="0,0,0,3"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBox x:Name="Hex1" Style="{StaticResource HexBox}" Width="180"
+                     Text="#00E676" TextChanged="Hex_TextChanged"/>
+            <Border x:Name="Preview1" Style="{StaticResource ColorPreview}"/>
+        </StackPanel>
+
+        <TextBlock Text="Color 2 (optional)" FontSize="11" Foreground="#888" Margin="0,0,0,3"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBox x:Name="Hex2" Style="{StaticResource HexBox}" Width="180"
+                     TextChanged="Hex_TextChanged"/>
+            <Border x:Name="Preview2" Style="{StaticResource ColorPreview}"/>
+        </StackPanel>
+
+        <TextBlock Text="Color 3 (optional)" FontSize="11" Foreground="#888" Margin="0,0,0,3"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+            <TextBox x:Name="Hex3" Style="{StaticResource HexBox}" Width="180"
+                     TextChanged="Hex_TextChanged"/>
+            <Border x:Name="Preview3" Style="{StaticResource ColorPreview}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancel" Width="70" Padding="0,5" Margin="0,0,8,0"
+                    Background="#333" Foreground="#CCC" BorderBrush="#555"
+                    Click="Cancel_Click" Cursor="Hand"/>
+            <Button x:Name="ApplyBtn" Content="Apply" Width="70" Padding="0,5"
+                    Background="#0078D4" Foreground="White" BorderBrush="#0078D4"
+                    Click="Apply_Click" Cursor="Hand"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

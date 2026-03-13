@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
@@ -30,6 +30,38 @@ public partial class App : Application
         var prevItem = contextMenu.Items.Add("⏮ Previous", null, async (_, _) => await _mediaService!.PreviousAsync());
         var playPauseItem = contextMenu.Items.Add("⏯ Play/Pause", null, async (_, _) => await _mediaService!.PlayPauseAsync());
         var nextItem = contextMenu.Items.Add("⏭ Next", null, async (_, _) => await _mediaService!.NextAsync());
+
+        contextMenu.Items.Add(new ToolStripSeparator());
+
+        var themeMenu = new ToolStripMenuItem("Bar Theme");
+        foreach (var preset in BarTheme.Presets)
+        {
+            var item = new ToolStripMenuItem(preset.Name);
+            item.Click += (_, _) =>
+            {
+                _animator?.SetTheme(preset);
+                foreach (ToolStripItem child in themeMenu.DropDownItems)
+                    if (child is ToolStripMenuItem mi) mi.Checked = false;
+                item.Checked = true;
+            };
+            if (preset == BarTheme.Presets[0]) item.Checked = true;
+            themeMenu.DropDownItems.Add(item);
+        }
+        themeMenu.DropDownItems.Add(new ToolStripSeparator());
+        var customThemeItem = new ToolStripMenuItem("Custom Theme...");
+        customThemeItem.Click += (_, _) =>
+        {
+            var dialog = new CustomThemeWindow();
+            if (dialog.ShowDialog() == true && dialog.ResultTheme != null)
+            {
+                _animator?.SetTheme(dialog.ResultTheme);
+                foreach (ToolStripItem child in themeMenu.DropDownItems)
+                    if (child is ToolStripMenuItem mi) mi.Checked = false;
+                customThemeItem.Checked = true;
+            }
+        };
+        themeMenu.DropDownItems.Add(customThemeItem);
+        contextMenu.Items.Add(themeMenu);
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
